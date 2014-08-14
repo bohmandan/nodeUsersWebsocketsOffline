@@ -1,0 +1,45 @@
+extends layout
+
+block body
+  div(ng-controller='AppCtrl')
+    span(ng-model='connection', ng-class="{true: 'connected', false: 'disconnected'}[connection.connected]", id="connected") {{connection.text}}
+    p You are here: 
+        a(ng-model='geoloc', ng-href="{{geoloc.link}}") {{geoloc.status.text}}
+        span(class='extrainfo' ng-if="geoloc.status.text != 'Loading position...'") Updated: 
+        span(class='extrainfo' ng-model='geoloc') {{geoloc.status.lastUpdateText}}
+        button(ng-click="updateGeolocation()") Refresh
+    p Cachestatus: 
+        span(ng-model='cachestatus') {{cachestatus.text}}
+    p Ping: 
+        span(ng-model='ping') {{ping.ms}}
+    h2 Hello {{name}}
+    ul.menu
+      li
+        a(href='view1') view1
+      li
+        a(href='view2') view2
+      li
+        a(href='chat') chat
+
+    div(ng-view)
+
+    div
+      | Test offline version: v
+      span(app-version)
+
+  script(src='/socket.io/socket.io.js')
+  script(src='bower_components/angular/angular.js')
+  script(src='bower_components/angular-route/angular-route.js')
+  script(src='bower_components/angular-socket-io/socket.js')
+  script(src='js/app.js')
+  script(src='js/services.js')
+  script(src='js/controllers.js')
+  script(src='js/filters.js')
+  script(src='js/directives.js')
+  
+  
+  
+//  .rating-container(ng-if="dataloading == 'itsloading'")
+//      p Betyg: LOADING...
+//   .rating-container(ng-if="dataloading == 'notloading'")
+//      p Betyg:

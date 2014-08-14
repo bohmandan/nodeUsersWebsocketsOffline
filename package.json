@@ -1,0 +1,13 @@
+{
+  "name": "nodeUsersWebsocketsOffline",
+  "version": "0.0.1",
+  "private": true,
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "^1.0.6",
+    "express": "^4.7.0",
+    "connect-cache-manifest": "^0.2.0",
+    "jade": "^1.5.0"
+  },
+  "author": " Daniel Bohman <bohmandan@gmail.com>"
+}
