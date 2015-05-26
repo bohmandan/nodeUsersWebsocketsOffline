@@ -4,10 +4,10 @@
   "private": true,
   "main": "app.js",
   "dependencies": {
-    "socket.io": "^1.0.6",
-    "express": "^4.7.0",
-    "connect-cache-manifest": "^0.2.0",
-    "jade": "^1.5.0"
+    "bower": "^1.3.12",
+    "express": "^4.11.2",
+    "jade": "^1.9.2",
+    "socket.io": "^1.3.4"
   },
   "author": " Daniel Bohman <bohmandan@gmail.com>"
 }

@@ -5,14 +5,16 @@
 
 var express = require('express'),
     routes = require('./routes'),
-    cacheManifest = require('connect-cache-manifest'),
     http = require('http'),
     jade = require('jade'),
+    fs = require('fs'),
     path = require('path');
 
 var app = module.exports = express();
-var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
+var http = http.Server(app);
+//var io = require('socket.io')(http, {'transports': ['websocket', 'polling']});
+var io = require('socket.io')(http);
+var rootPath = __dirname;
 
 /**
  * Configuration
@@ -21,15 +23,28 @@ var io = require('socket.io').listen(server);
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/helpers', express.static(__dirname + '/helpers'));
 app.set('view engine', 'jade');
+var pathToManifestAppcache = "/manifest.appcache";
+var pathToFonts = rootPath+'public/fonts';
+
 
 // development only
 var env = process.env.NODE_ENV || 'development';
-if ('development' == env) {
-  //app.use(express.errorHandler());
-}
+
 /* lower debug level socket io */
-io.set('log level', 1);
+//io.set('log level', 1);
+io.set('transports', ['websocket', 
+                      'polling']);
+
+/*
+io.set('transports', ['websocket', 
+                      'flashsocket', 
+                      'htmlfile', 
+                      'xhr-polling', 
+                      'jsonp-polling', 
+                      'polling']);
+*/
 
 // production only
 if (app.get('env') === 'production') {
@@ -40,18 +55,30 @@ if (app.get('env') === 'production') {
  * Offline feature
  */
 
-app.get("/manifest.appcache", function(req, res){
+/* 
+http://stackoverflow.com/questions/12346690/is-there-a-way-to-make-angularjs-load-partials-in-the-beginning-and-not-at-when?rq=1
+http://stackoverflow.com/questions/23652183/makes-angular-js-works-offline
+*/
+
+app.get(pathToManifestAppcache, function (req, res) {
     res.set("Content-Type", "text/cache-manifest");
-    res.status(200).sendfile('manifest.appcache');
+    res.status(200).sendFile(rootPath+'/manifest.appcache');
 });
+
 /*
-app.get("/test.html", function(req, res){
-    res.set("Content-Type", "text/html");
-    res.status(200).sendfile('test.html');
+app.get('/fonts/:file', function (req, res) {
+    var file = req.params.file;
+    
+    console.log('request to /fonts came in');
+    console.log(file);
+    //console.log(req);
+    res.set("Content-Type", "application/x-font-woff");
+    res.status(200).sendFile(rootPath+'/public/fonts/'+file);
 });
 */
+/* test */
 app.get('/test.html', function (req, res) {
-  res.sendfile(__dirname + '/test.html');
+  res.sendFile(rootPath + '/test.html');
 });
 
 
@@ -62,6 +89,9 @@ app.get('/test.html', function (req, res) {
 // serve index and view partials
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
+app.get('/admin/', routes.admin); // admin as separate - new controller in body
+
+
 
 // JSON API
 //app.get('/api/name', api.name);
@@ -70,12 +100,63 @@ app.get('/partials/:name', routes.partials);
 app.get('*', routes.index);
 
 // Socket.io Communication
-io.sockets.on('connection', require('./routes/socket'));
+//AUTH
+/*
+NO NEED FOR BEFORE AUTH, since we allow guest users too.
+io.use(function(socket, next) {
+    var handshakeData = socket.handshake;
+    //console.log(handshakeData);
+    console.log('aafterHandshake');
+    //console.log(handshakeData.query);
+    console.log(socket.handshake.query);
+    if (socket.handshake.query.token) {
+        console.log(socket.handshake.query.token);
+        console.log(socket.handshake.query.token);
+        console.log(socket.handshake.query.token);
+    }
+    
+    if (handshakeData.headers.cookie) {
+        var req = {
+            headers: {
+                cookie: handshake.headers.cookie,
+            }
+        }
+
+        if (socket) {
+            next();
+        } else {
+            console.log('beror invalid session error');
+            return next(new Error('Invalid Session'));
+        }
+    } else {
+        console.log('beror missing query token error');
+        next(new Error('Missing query token'));
+    }
+    
+});
+*/ 
+
+//SOCKET FILE
+var socketManager = require('./routes/socket')(io);
+
+/*
+same as:
+io.sockets.on('connection', function (socket) {
+  socket.on('message', function () { });
+  socket.on('disconnect', function () { });
+});
+*/
+
 
 /**
  * Start Server
  */
-
+/*
 server.listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
+});
+*/
+
+http.listen(app.get('port'), function(){
+  console.log('listening on *:'+app.get('port'));
 });

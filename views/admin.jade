@@ -1,0 +1,35 @@
+extends layout
+
+block body
+  div(ng-controller='adminCtrl')
+    h2 Hello {{name}}
+    h3 QuantityTest {{quantity}}
+
+    button(ng-click="updateManifest()") Update manifestCache
+    span(class='status' ng-model="updateManifestResult") {{updateManifestResult}}
+    br
+    .col
+      h3 Users
+      .overflowable
+        p(ng-repeat='user in users') {{user}}
+    br
+
+    div
+      | Test offline version: v
+      span(app-version)
+
+  script(src='/socket.io/socket.io.js')
+  script(src='bower_components/angular/angular.js')
+  script(src='bower_components/angular-route/angular-route.js')
+  script(src='bower_components/angular-socket-io/socket.js')
+  script(src='js/app.js')
+  script(src='js/services.js')
+  script(src='js/controllers.js')
+  script(src='js/filters.js')
+  script(src='js/directives.js')
+  
+  
+//  .rating-container(ng-if="dataloading == 'itsloading'")
+//      p Betyg: LOADING...
+//   .rating-container(ng-if="dataloading == 'notloading'")
+//      p Betyg:

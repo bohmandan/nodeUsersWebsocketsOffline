@@ -1,10 +1,9 @@
 'use strict';
+console.log('loading app.js');
 
-// Declare app level module which depends on filters, and services
-
+    
 angular.module('myApp', [
   'ngRoute',
-
   'myApp.controllers',
   'myApp.filters',
   'myApp.services',
@@ -26,6 +25,10 @@ config(function ($routeProvider, $locationProvider) {
       when('/chat', {
       templateUrl: 'partials/chat',
       controller: 'chatCtrl'
+    }).
+    when('/admin', {
+      templateUrl: 'admin',
+      controller: 'adminCtrl'
     }).
     otherwise({
       redirectTo: '/view1'

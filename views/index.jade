@@ -2,17 +2,29 @@ extends layout
 
 block body
   div(ng-controller='AppCtrl')
-    span(ng-model='connection', ng-class="{true: 'connected', false: 'disconnected'}[connection.connected]", id="connected") {{connection.text}}
-    p You are here: 
-        a(ng-model='geoloc', ng-href="{{geoloc.link}}") {{geoloc.status.text}}
-        span(class='extrainfo' ng-if="geoloc.status.text != 'Loading position...'") Updated: 
-        span(class='extrainfo' ng-model='geoloc') {{geoloc.status.lastUpdateText}}
-        button(ng-click="updateGeolocation()") Refresh
-    p Cachestatus: 
-        span(ng-model='cachestatus') {{cachestatus.text}}
-    p Ping: 
-        span(ng-model='ping') {{ping.ms}}
-    h2 Hello {{name}}
+    h1 Controlls & status
+    div 
+        h2 Internet connection: 
+        span(ng-model='onlinestatus', ng-class="{true: 'onlinestatus-online', false: 'onlinestatus-offline'}[onlinestatus.online]", id="onlinestatus") {{onlinestatus.text}} 
+    div 
+        h2 Server connection:
+        span(ng-model='connection', ng-class="{true: 'connected', false: 'disconnected'}[connection.connected]", id="connected") {{connection.text}}, 
+        span(ng-model='connection') transport: {{connection.transport}}
+    div 
+        h2 You are here: 
+        div(id="curloc-container", ng-if="myself.geoloc.lastUpdateDate")
+            a(ng-model='myself', href="http://maps.google.com/maps?q={{myself.geoloc.lat}},{{myself.geoloc.lon}}") Link to position map 
+            p Updated: 
+            span(class='extrainfo' ng-model='myself') {{myself.geoloc.lastUpdateDate | dater}}
+        button(ng-click="geolocService.updateGeoloc()") Refresh
+    div 
+        h2 Cachestatus: 
+        span(id="cachestatus", ng-model='cachestatus', ng-class='[cachestatus.status]') {{cachestatus.text}}
+    div(ng-controller='pingCtrl') 
+        h2 Ping: 
+        span(id="pingval", ng-model='ping') {{ping.pingValueMs}} 
+        button(id="pingtogglebutton", ng-model='ping', ng-click='pingItToggle()') {{ping.buttonText}}
+    h2 Hello {{myself.name}}
     ul.menu
       li
         a(href='view1') view1
@@ -22,22 +34,15 @@ block body
         a(href='chat') chat
 
     div(ng-view)
+    
+    .clr
+        p Well: {{dataStore.test}}
+        p Well2: {{dataStore.test}}
 
     div
       | Test offline version: v
       span(app-version)
-
-  script(src='/socket.io/socket.io.js')
-  script(src='bower_components/angular/angular.js')
-  script(src='bower_components/angular-route/angular-route.js')
-  script(src='bower_components/angular-socket-io/socket.js')
-  script(src='js/app.js')
-  script(src='js/services.js')
-  script(src='js/controllers.js')
-  script(src='js/filters.js')
-  script(src='js/directives.js')
-  
-  
+      
   
 //  .rating-container(ng-if="dataloading == 'itsloading'")
 //      p Betyg: LOADING...

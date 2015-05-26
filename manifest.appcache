@@ -1,32 +1,30 @@
 CACHE MANIFEST
-# 2014-07-27:v4
+# KEEP THIS ON SECOND LINE AND DO NOT EDIT - NEW VERSION UPDATED: Fri Mar 13 2015 17:11:50 GMT+0100 (W. Europe Standard Time)
 
-# Explicitly cached entries
-#view1 - TEMPORARY for dev
-chat
-img/offline.jpg
-test.html
+CACHE:
+# views
+partials/partial1
+partials/partial2
+partials/chat
 
-css/app.css
+# scripts
 bower_components/angular-socket-io/socket.js
 bower_components/angular/angular.js
 bower_components/angular-route/angular-route.js
 socket.io/socket.io.js
 js/app.js
 js/services.js
-#js/controllers.js - TEMPORARY for dev
+js/controllers.js
 js/filters.js
 js/directives.js
 
-partials/partial1
-partials/chat
-
-fonts/Railway-light.woff
-
+# resources
+img/offline.jpg
+css/app.css
+fonts/Raleway-ExtraBold.woff
 
 NETWORK:
 *
 
-# Fallback content
 FALLBACK:
-/theorig.html fallback.html
+img/online.jpg img/offline.jpg

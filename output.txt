@@ -1,0 +1,68 @@
+CACHE MANIFEST
+# 2014-08-26:v4
+
+# Explicitly cached entries
+#view1 - TEMPORARY for dev
+chat
+img/offline.jpg
+test.html
+
+css/app.css
+bower_components/angular-socket-io/socket.js
+bower_components/angular/angular.js
+bower_components/angular-route/angular-route.js
+socket.io/socket.io.js
+js/app.js
+js/services.js
+#js/controllers.js - TEMPORARY for dev
+js/filters.js
+js/directives.js
+
+partials/partial1
+partials/chat
+
+fonts/Railway-light.woff
+
+
+NETWORK:
+/admin
+admin
+*
+
+# Fallback content
+FALLBACK:
+/theorig.html fallback.html
+CACHE MANIFEST
+# 2014-08-26:v4
+
+# Explicitly cached entries
+#view1 - TEMPORARY for dev
+chat
+img/offline.jpg
+test.html
+
+css/app.css
+bower_components/angular-socket-io/socket.js
+bower_components/angular/angular.js
+bower_components/angular-route/angular-route.js
+socket.io/socket.io.js
+js/app.js
+js/services.js
+#js/controllers.js - TEMPORARY for dev
+js/filters.js
+js/directives.js
+
+partials/partial1
+partials/chat
+
+fonts/Railway-light.woff
+
+
+NETWORK:
+/admin
+admin
+*
+
+# Fallback content
+FALLBACK:
+/theorig.html fallback.html
