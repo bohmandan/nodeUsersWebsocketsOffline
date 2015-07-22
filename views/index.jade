@@ -1,47 +1,22 @@
 extends layout
 
-block body
-  div(ng-controller='AppCtrl')
-    h1 Controlls & status
-    div 
-        h2 Internet connection: 
-        span(ng-model='onlinestatus', ng-class="{true: 'onlinestatus-online', false: 'onlinestatus-offline'}[onlinestatus.online]", id="onlinestatus") {{onlinestatus.text}} 
-    div 
-        h2 Server connection:
-        span(ng-model='connection', ng-class="{true: 'connected', false: 'disconnected'}[connection.connected]", id="connected") {{connection.text}}, 
-        span(ng-model='connection') transport: {{connection.transport}}
-    div 
-        h2 You are here: 
-        div(id="curloc-container", ng-if="myself.geoloc.lastUpdateDate")
-            a(ng-model='myself', href="http://maps.google.com/maps?q={{myself.geoloc.lat}},{{myself.geoloc.lon}}") Link to position map 
-            p Updated: 
-            span(class='extrainfo' ng-model='myself') {{myself.geoloc.lastUpdateDate | dater}}
-        button(ng-click="geolocService.updateGeoloc()") Refresh
-    div 
-        h2 Cachestatus: 
-        span(id="cachestatus", ng-model='cachestatus', ng-class='[cachestatus.status]') {{cachestatus.text}}
-    div(ng-controller='pingCtrl') 
-        h2 Ping: 
-        span(id="pingval", ng-model='ping') {{ping.pingValueMs}} 
-        button(id="pingtogglebutton", ng-model='ping', ng-click='pingItToggle()') {{ping.buttonText}}
-    h2 Hello {{myself.name}}
-    ul.menu
-      li
-        a(href='view1') view1
-      li
-        a(href='view2') view2
-      li
-        a(href='chat') chat
-
-    div(ng-view)
-    
-    .clr
-        p Well: {{dataStore.test}}
-        p Well2: {{dataStore.test}}
-
-    div
-      | Test offline version: v
-      span(app-version)
+block content
+  include ./partials/sidebar.jade
+    //div(layout="column" flex id="content")
+  div(layout="column" class="relative" layout-fill role="main")
+    include ./partials/navbar.jade
+    md-content(flex md-scroll-y)
+      ui-view(layout="column" layout-fill layout-padding)
+        div(class="inset" hide-sm)
+          ng-switch(on="data.selectedIndex" class="tabpanel-container")
+            div(role="tabpanel" id="tab1-content" aria-labelledby="tab1" ng-switch-when="0" md-swipe-left="next()" md-swipe-right="previous()" layout="row" layout-align="center center")
+              md-card(flex-gt-sm="90" flex-gt-md="80")
+                md-card-content
+                  include ./partials/chat.jade
+            div(role="tabpanel" id="tab2-content" aria-labelledby="tab2" ng-switch-when="1" md-swipe-left="next()" md-swipe-right="previous()" layout="row" layout-align="center center")
+              md-card(flex-gt-sm="90" flex-gt-md="80")
+                md-card-content
+                  include ./partials/overview.jade
       
   
 //  .rating-container(ng-if="dataloading == 'itsloading'")

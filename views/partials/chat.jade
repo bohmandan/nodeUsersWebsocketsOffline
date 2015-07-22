@@ -1,36 +1,33 @@
-h1 Angular Socket.io IM Demo App
 div(ng-controller='chatCtrl')
-    .col
-      h3 Messages
-      .overflowable.msgscontainer
-        p(ng-repeat='message in messages',
-          ng-class='{alert: message.username == "chatroom"}',
-          data-msgid="{{message.msgId}}",
-          data-userid="{{message.userId}}") {{message.username}}: {{message.text}}
-
-    .col
-      h3 Users
-      .overflowable.userscontainer
-        div(class="usercontainer", ng-class="{ 'isuser': user.isMyself, 'istyping': user.isTyping }", usercontainer, data-userid="{{user.id}}", ng-repeat='user in users') {{user.name}}
+    md-toolbar
+        div(class="md-toolbar-tools")
+            h2(class="md-flex")
+                span Chat
+            span(flex)
+            md-button(class="md-icon-button" aria-label="More")
+                ng-md-icon(icon="more_vert")
+    md-subheader(class="md-no-sticky") Users
+    md-list.overflowable.userscontainer
+        md-list-item(class="usercontainer", ng-class="{ 'isuser': user.isMyself, 'istyping': user.isTyping }", usercontainer, data-userid="{{user.id}}", ng-repeat='user in dataStore.users') {{user.name}}
             div(class="geoloccontainer", ng-if="user.geoloc.lastUpdateDate")
                 a(href="http://maps.google.com/maps?q={{user.geoloc.lat}},{{user.geoloc.lon}}") Link to position map
                 span  - Last updated: {{user.geoloc.lastUpdateDate | dater}}
             span(class="typing-indicator", ng-if="user.isTyping")  typing...
-            
-        div(class="usercontainer", ng-class="{ 'isuser': user.isMyself, 'istyping': user.isTyping }", usercontainer, data-userid="{{user.id}}", ng-repeat='user in dataStore.users') {{user.name}}
-            div(class="geoloccontainer", ng-if="user.geoloc.lastUpdateDate")
-                a(href="http://maps.google.com/maps?q={{user.geoloc.lat}},{{user.geoloc.lon}}") Link to position map
-                span  - Last updated: {{user.geoloc.lastUpdateDate | dater}}
-            span(class="typing-indicator", ng-if="user.isTyping")  typing...
-    .clr
-      form(ng-submit='sendMessage()')
-        | Message: 
-        input(size='60', ng-model='message', ng-keypress='userIsTypingSend()')
-        input(type='submit', value='Send')
-
-    .clr
-      h3 Change your name
-      p Your current user name is {{myself.name}}
-      form(ng-submit='changeName()')
-        input(ng-model='newName')
-        input(type='submit', value='Change Name')
+    md-divider
+    md-subheader(class="md-no-sticky") Messages
+    md-list.overflowable.msgscontainer
+        md-list-item(ng-repeat='message in messages' ng-class='{alert: message.username == "chatroom"}' data-msgid="{{message.msgId}}" data-userid="{{message.userId}}") {{message.username}}: {{message.text}}
+        md-list-item(ng-show="!messages.length") Empty, no messages yet...
+    form(ng-submit='sendMessage()')
+        div(layout layout-sm="column")
+            md-input-container(style="width:50%")
+                input(size='60', ng-model='message', ng-keypress='userIsTypingSend()' placeholder='New message')
+            md-button(type='submit', value='Send message') Send message
+    md-divider              
+    md-subheader Your profile
+        p Current user name is {{myself.name}}
+        form(ng-submit='changeName()')
+            div(layout layout-sm="column")
+                md-input-container(style="width:50%")
+                    input(ng-model='newName' placeholder='New name')
+                md-button(type='submit', value='Change Name') Change Name

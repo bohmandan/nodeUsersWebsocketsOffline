@@ -1,0 +1,23 @@
+md-sidenav(layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')")
+  md-toolbar(class="md-tall md-hue-2")
+    span(flex)
+    div(layout="column" class="md-toolbar-tools-bottom inset")
+      user-avatar
+      span
+      div Firstname Lastname
+      div email@domainname.com
+  md-list
+    md-list-item(ng-repeat="item in menu")
+      md-button(ng-click="menu.selectUser(item)" ng-class="{'selected' : item === menu.selected }")
+        md-item-content(flex md-ink-ripple layout="row" layout-align="start center")
+          div(class="inset")
+            ng-md-icon(icon="{{item.icon}}")
+          div(class="inset") {{item.title}}
+    md-divider
+    md-subheader Management
+    md-list-item(ng-repeat="item in admin")
+      md-button(ng-click="admin.selectUser(item)" ng-class="{'selected' : item === admin.selected }")
+        md-item-content(md-ink-ripple layout="row" layout-align="start center")
+          div(class="inset")
+            ng-md-icon(icon="{{item.icon}}")
+          div(class="inset") {{item.title}}

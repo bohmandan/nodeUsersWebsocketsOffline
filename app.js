@@ -1,162 +1,112 @@
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var socket_io = require( "socket.io" );
 
-/**
- * Module dependencies
- */
+var routes = require('./routes/index');
+// not used for now
+// var users = require('./routes/users');
 
-var express = require('express'),
-    routes = require('./routes'),
-    http = require('http'),
-    jade = require('jade'),
-    fs = require('fs'),
-    path = require('path');
+// Express
+var app = express();
 
-var app = module.exports = express();
-var http = http.Server(app);
-//var io = require('socket.io')(http, {'transports': ['websocket', 'polling']});
-var io = require('socket.io')(http);
-var rootPath = __dirname;
+// Socket.io
+var io = socket_io();
+app.io = io;
 
-/**
- * Configuration
- */
-
-// all environments
-app.set('port', process.env.PORT || 3000);
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/helpers', express.static(__dirname + '/helpers'));
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+
 var pathToManifestAppcache = "/manifest.appcache";
-var pathToFonts = rootPath+'public/fonts';
-
-
-// development only
-var env = process.env.NODE_ENV || 'development';
-
-/* lower debug level socket io */
-//io.set('log level', 1);
-io.set('transports', ['websocket', 
-                      'polling']);
-
 /*
-io.set('transports', ['websocket', 
-                      'flashsocket', 
-                      'htmlfile', 
-                      'xhr-polling', 
-                      'jsonp-polling', 
-                      'polling']);
-*/
-
-// production only
-if (app.get('env') === 'production') {
-  // TODO
-};
-
-/**
- * Offline feature
- */
-
-/* 
-http://stackoverflow.com/questions/12346690/is-there-a-way-to-make-angularjs-load-partials-in-the-beginning-and-not-at-when?rq=1
-http://stackoverflow.com/questions/23652183/makes-angular-js-works-offline
-*/
-
 app.get(pathToManifestAppcache, function (req, res) {
     res.set("Content-Type", "text/cache-manifest");
     res.status(200).sendFile(rootPath+'/manifest.appcache');
 });
-
-/*
-app.get('/fonts/:file', function (req, res) {
-    var file = req.params.file;
-    
-    console.log('request to /fonts came in');
-    console.log(file);
-    //console.log(req);
-    res.set("Content-Type", "application/x-font-woff");
-    res.status(200).sendFile(rootPath+'/public/fonts/'+file);
-});
 */
-/* test */
-app.get('/test.html', function (req, res) {
-  res.sendFile(rootPath + '/test.html');
-});
 
+/* helper */
+if (typeof String.prototype.endsWith !== 'function') {
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+}
 
-/**
- * Routes
- */
-
-// serve index and view partials
-app.get('/', routes.index);
-app.get('/partials/:name', routes.partials);
-app.get('/admin/', routes.admin); // admin as separate - new controller in body
-
-
-
-// JSON API
-//app.get('/api/name', api.name);
-
-// redirect all others to the index (HTML5 history)
-app.get('*', routes.index);
-
-// Socket.io Communication
-//AUTH
-/*
-NO NEED FOR BEFORE AUTH, since we allow guest users too.
-io.use(function(socket, next) {
-    var handshakeData = socket.handshake;
-    //console.log(handshakeData);
-    console.log('aafterHandshake');
-    //console.log(handshakeData.query);
-    console.log(socket.handshake.query);
-    if (socket.handshake.query.token) {
-        console.log(socket.handshake.query.token);
-        console.log(socket.handshake.query.token);
-        console.log(socket.handshake.query.token);
-    }
-    
-    if (handshakeData.headers.cookie) {
-        var req = {
-            headers: {
-                cookie: handshake.headers.cookie,
-            }
+var staticFileRoutes = [
+    pathToManifestAppcache,
+    '/node_modules/angular-material/angular-material.min.css',
+    '/node_modules/angular/angular.min.js',
+    '/node_modules/angular-aria/angular-aria.min.js',
+    '/node_modules/angular-animate/angular-animate.min.js',
+    '/node_modules/angular-material/angular-material.min.js',
+    '/node_modules/angular-material-icons/angular-material-icons.min.js'
+];
+staticFileRoutes.forEach(function(route) {
+    app.get(route, function (req, res) {
+        if (route.endsWith('.appcache')) {
+            res.set("Content-Type", "text/cache-manifest");
         }
-
-        if (socket) {
-            next();
-        } else {
-            console.log('beror invalid session error');
-            return next(new Error('Invalid Session'));
-        }
-    } else {
-        console.log('beror missing query token error');
-        next(new Error('Missing query token'));
-    }
-    
+        res.sendFile( __dirname+route );
+    });
 });
-*/ 
-
-//SOCKET FILE
-var socketManager = require('./routes/socket')(io);
 
 /*
-same as:
-io.sockets.on('connection', function (socket) {
-  socket.on('message', function () { });
-  socket.on('disconnect', function () { });
+app.get('/node_modules/angular-material/angular-material.min.css', function (req, res) {
+    res.sendFile( __dirname+'/node_modules/angular-material/angular-material.min.css' ) 
 });
 */
 
+app.use(express.static(path.join(__dirname, '/public')));
 
-/**
- * Start Server
- */
-/*
-server.listen(app.get('port'), function () {
-  console.log('Express server listening on port ' + app.get('port'));
-});
-*/
+app.use('/', routes);
+// not used for now
+//app.use('/users', users);
 
-http.listen(app.get('port'), function(){
-  console.log('listening on *:'+app.get('port'));
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
+
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
+});
+
+// Socket code here
+require('./sockets/socket.js')(io);
+
+
+module.exports = app;
