@@ -381,11 +381,9 @@ factory('socket', function (socketFactory) {
         console.log(dataStore.myself);
         //$scope.geolocService.updateGeoloc();
         console.log('should DO geolocService.updateGeoloc();');
-
     } else {
         console.log('no $scope.myself - sending chatInitRequest');
         socket.emit('chatInitRequest');
-
     }
 
     /* test, this should be message service later */
