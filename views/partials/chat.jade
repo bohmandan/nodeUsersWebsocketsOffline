@@ -25,9 +25,10 @@ div(ng-controller='chatCtrl')
             md-button(type='submit', value='Send message') Send message
     md-divider              
     md-subheader Your profile
-    p Current user name is {{myself.name}}
+    p Current user name is {{dataStore.myself.name}}
     form(ng-submit='changeName()')
         div(layout layout-sm="column")
             md-input-container(style="width:50%")
                 input(ng-model='newName' placeholder='New name')
             md-button(type='submit', value='Change Name') Change Name
+            md-progress-circular(class='md-hue-2', md-mode='indeterminate', ng-show='isLoadingNewName')

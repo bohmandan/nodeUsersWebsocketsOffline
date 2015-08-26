@@ -10,7 +10,7 @@ window.offlineApp = window.axiell || {};
 window.offlineApp.helpers = window.offlineApp.helpers || {};
 
 window.offlineApp.helpers.hashCode = function (s) {
-    'use strict';
+    //'use strict'; - remove for now, angular socket io issue passing function as argument
     return s.split("").reduce(function (a, b) {
         a = ((a << 5) - a) + b.charCodeAt(0);
         return a & a;
@@ -19,7 +19,7 @@ window.offlineApp.helpers.hashCode = function (s) {
 
 /* create global object */
 window.offlineApp.helpers.dater = (function (thenBeforeCheck) {
-    'use strict';
+    //'use strict'; - remove for now, angular socket io issue passing function as argument
     var then;
 
     function isDate(val) {
@@ -286,7 +286,7 @@ window.offlineApp.helpers.appCacheStatus = (function () {
 
 
 //define(['angular'], function (angular) {
-'use strict';
+//'use strict'; - remove for now, angular socket io issue passing function as argument
 
 
 function DialogController($scope, $mdDialog) {
@@ -837,22 +837,28 @@ angular.module('myApp.controllers', []).controller('AppCtrl', function ($scope, 
     // ==============================
 
     $scope.changeName = function () {
+        $scope.isLoadingNewName = true;
+        console.log('changeName, socket.emit changeRequest');
         socket.emit('changeRequest:name', {
             name: $scope.newName
-        }, function (data) {
-            if (!data) {
-                alert('There was an error changing your name');
-            } else {
-                console.log(data);
-                $scope.usersService.updateMyself(data);
+        }, function(myselfData) {
+            console.log(myselfData);
+            if (myselfData) {
+                console.log(myselfData);
+                //$scope.usersService.updateMyself(dataz);
+                dataFactory.updateMyself(myselfData);
                 /*
                 changeName($scope.myself.name, $scope.newName);
 
                 $scope.myself.name = $scope.newName;
                 $scope.newName = '';
                 */
+            } else {
+                alert('There was an error changing your name');
             }
+            $scope.isLoadingNewName = false;
         });
+        console.log('changeRequest:name SENT!');
     };
 
     $scope.messages = [];

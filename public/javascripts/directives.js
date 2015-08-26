@@ -1,5 +1,5 @@
 //define(['angular'], function (angular) {
-'use strict';
+//'use strict'; - remove for now, angular socket io issue passing function as argument
     
     
 /* Controllers */

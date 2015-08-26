@@ -8,10 +8,7 @@ console.log('loading services.js');
 angular.module('myApp.services', []).
 factory('socket', ['$rootScope',
     function ($rootScope) {
-        /*
-factory('socket', function (socketFactory) {
-*/
-        'use strict';
+        'use strict'; // required for angular socket io issue passing function as argument
 
         var tokenObj;
         if (window.sessionStorage.getItem('token')) {
@@ -36,10 +33,24 @@ factory('socket', function (socketFactory) {
 */
         return {
             on: function (eventName, callback) {
-                socket.on(eventName, callback);
+              socket.on(eventName, function () {  
+                var args = arguments;
+                $rootScope.$apply(function () {
+                  callback.apply(socket, args);
+                });
+              });
             },
-            emit: function (eventName, data) {
-                socket.emit(eventName, data);
+            emit: function (eventName, data, callback) {
+                console.log('EMIT!');
+                console.log(callback);
+                socket.emit(eventName, data, function () {
+                var args = arguments;
+                $rootScope.$apply(function () {
+                  if (typeof callback == 'function') {
+                    callback.apply(socket, args);
+                  }
+                });
+                })
             },
             removeAllListeners: function () {
                 socket.removeAllListeners();
@@ -155,14 +166,14 @@ factory('socket', function (socketFactory) {
         });
     };
 
-    var updateMyself = function (dataMsg) {
+    var updateMyself = function (myselfData) {
         console.log('updateMyself - with dataMsg.myself: ');
-        console.log(dataMsg.myself);
+        console.log(myselfData.myself);
         if (dataStore.myself) {
             console.log('yes - dataStore.myself exist');
-            if (!dataStore.myself.geoloc && dataMsg.myself.geoloc) {
+            if (!dataStore.myself.geoloc && myselfData.myself.geoloc) {
                 console.log('no - dataStore.myself.geoloc does not exist, yes dataStore.myself.geoloc exist');
-                dataStore.myself.geoloc = dataMsg.myself.geoloc;
+                dataStore.myself.geoloc = myselfData.myself.geoloc;
                 /* why this here?
                 $interval(
                     console.log('updating interval time'),
@@ -171,11 +182,11 @@ factory('socket', function (socketFactory) {
                     // }) 
                     , 5000);
                     */
-            } else if (dataMsg.myself.geoloc) {
+            } else if (myselfData.myself.geoloc) {
                 console.log('yes - dataStore.myself.geoloc does exist');
-                if (dataStore.myself.geoloc.lastUpdateDate < dataMsg.myself.geoloc.latestUpdateDate) {
+                if (dataStore.myself.geoloc.lastUpdateDate < myselfData.myself.geoloc.latestUpdateDate) {
                     console.log('yes - dataStore.myself.geoloc.lastUpdateDate is less then dataStore.myself date - the new data');
-                    dataStore.myself.geoloc = dataMsg.myself.geoloc;
+                    dataStore.myself.geoloc = myselfData.myself.geoloc;
                     /* why this here?
                     $interval(
                         console.log('updating interval time'),
@@ -188,40 +199,40 @@ factory('socket', function (socketFactory) {
             }
             console.log('applying the rest.');
             /* $scope.$apply(function () {  */
-            dataStore.myself.name = dataMsg.myself.name ? dataMsg.myself.name : dataStore.myself.name;
-            dataStore.myself.id = dataMsg.myself.id ? dataMsg.myself.id : dataStore.myself.id;
-            dataStore.myself.socketId = dataMsg.myself.socketId ? dataMsg.myself.socketId : dataStore.myself.socketId;
+            dataStore.myself.name = myselfData.myself.name ? myselfData.myself.name : dataStore.myself.name;
+            dataStore.myself.id = myselfData.myself.id ? myselfData.myself.id : dataStore.myself.id;
+            dataStore.myself.socketId = myselfData.myself.socketId ? myselfData.myself.socketId : dataStore.myself.socketId;
             /* }); */
         } else {
             /* $scope.$apply(function () { */
-            dataStore.myself = dataMsg.myself;
+            dataStore.myself = myselfData.myself;
             /* }); */
         }
-        if (dataMsg.myself.token) {
+        if (myselfData.myself.token) {
             console.log('dataMsg.myself.token true');
-            if (dataMsg.myself.token != window.sessionStorage.getItem('token')) {
-                console.log('updating token: ' + dataMsg.myself.token);
+            if (myselfData.myself.token != window.sessionStorage.getItem('token')) {
+                console.log('updating token: ' + myselfData.myself.token);
                 console.log('old token from session storage: ' + window.sessionStorage.getItem('token'));
-                sessionStorage.setItem('token', dataMsg.myself.token);
+                sessionStorage.setItem('token', myselfData.myself.token);
             } else {
                 console.log('dataMsg.myself.token equal sessionStorage token');
             }
             /* after - delete it */
-            delete dataMsg.myself.token;
+            delete myselfData.myself.token;
         } else {
             console.log('dataMsg.myself.token false');
         }
         // update myself in users array
         localStorage.setItem('myself', JSON.stringify(dataStore.myself));
-        if (dataMsg.sendUpdateMyself) {
+        if (myselfData.sendUpdateMyself) {
             /* needs to send myself as well as missing latest dates */
             _sendUpdateMyself();
         } else {
             /* update immediately */
             updateUser({
-                user: dataMsg.myself,
-                oldUpdateUsersDate: dataMsg.oldUpdateUsersDate,
-                newUpdateUsersDate: dataMsg.newUpdateUsersDate
+                user: myselfData.myself,
+                oldUpdateUsersDate: myselfData.oldUpdateUsersDate,
+                newUpdateUsersDate: myselfData.newUpdateUsersDate
             });
         }
         localStorage.setItem('myself', JSON.stringify(dataStore.myself));
@@ -416,7 +427,7 @@ factory('socket', function (socketFactory) {
     });
 
     socket.on('user:join', function (dataMsg) {
-        console.log('user:join username: ' + data.user.name);
+        console.log('user:join username: ' + dataMsg.user.name);
         updateUser(dataMsg);
 
         $scope.messages.push({
@@ -464,6 +475,7 @@ factory('socket', function (socketFactory) {
             return dataStore.test;
         },
         updateUser: updateUser,
+        updateMyself: updateMyself,
         loadData: loadData,
         dataStore: dataStore
 

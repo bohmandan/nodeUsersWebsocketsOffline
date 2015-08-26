@@ -1,4 +1,4 @@
-'use strict';
+//'use strict'; - remove for now, angular socket io issue passing function as argument
 console.log('loading app.js');
 
     

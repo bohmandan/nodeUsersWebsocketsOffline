@@ -4,7 +4,7 @@ md-sidenav(layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2"
     div(layout="column" class="md-toolbar-tools-bottom inset")
       user-avatar
       span
-      div Firstname Lastname
+      div {{dataStore.myself.name}}
       div email@domainname.com
   md-list
     md-list-item(ng-repeat="item in menu")

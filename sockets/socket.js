@@ -135,7 +135,7 @@ var usersService = (function () {
 
     var findUserByUsername = function (username) {
         console.log('findUserByUsername: ' + username);
-        var user;
+        var user = false;
         if (users.length) {
             users.forEach(function (userInArray) {
                 if (userInArray.name === username) {
@@ -533,13 +533,17 @@ module.exports = function (io) {
         });
 
         // validate a user's name change, and broadcast it on success
-        socket.on('changeRequest:name', function (data, fn) {
+        socket.on('changeRequest:name', function(data, callback){
+            console.log('changeRequest:name');
+            console.log(data);
+            console.log(callback);
             if (userNames.claim(user.id, data.name)) {
                 var oldName = user.name;
                 user.name = data.name;
                 userNames.free(oldName);
                 usersService.updateUser(user);
 
+                // updating other users
                 socket.broadcast.emit('change:name', {
                     oldUpdateUsersDate: oldUpdateUsersDate,
                     newUpdateUsersDate: lastUpdateUsersDate,
@@ -549,15 +553,24 @@ module.exports = function (io) {
                         name: user.name
                     }
                 });
-
-                fn({
+                
+                console.log('change:name broadcast emit');
+                
+                var myselfData = {
                     myself: user,
                     oldUpdateUsersDate: oldUpdateUsersDate,
                     newUpdateUsersDate: lastUpdateUsersDate
-                });
+                };
+                
+                /* responding with callback */
+                callback(myselfData);
+
+                
             } else {
                 /* fn - need to review... */
-                fn(false);
+                callback(false);
+                
+                console.log('no change:name broadcast sent');
             }
         });
 
